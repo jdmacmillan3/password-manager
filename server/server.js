@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
-const PORT = 5001
+const PORT = process.env.PORT || 3005;
+const db = require ('./db');
 
 app.get(`/`, (req, res) => {
     res.send("Hello World");
