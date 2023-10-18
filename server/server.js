@@ -5,6 +5,8 @@ const PORT = process.env.PORT || 3005;
 const cors = require('cors');
 const db = require ('./db');
 
+const {encrypt, decrypt} = require(`./EncryptionHandler`)
+
 app.use(cors());
 app.use(express.json());
 
@@ -57,10 +59,12 @@ app.get('/', (req, res) => {
 
 app.post(`/addPassword`, async (req, res) => {
     console.log(req.body);
+    const encryptedPassword = encrypt(req.body.password);
+
     try{
         const results = await db.query(
-            "INSERT INTO passwords (password, account) VALUES ($1, $2) returning *",
-            [req.body.password, req.body.account]);
+            "INSERT INTO passwords (password, account, iv) VALUES ($1, $2, $3) returning *",
+            [encryptedPassword.password, req.body.account, encryptedPassword.iv]);
         res.status(201).json({
             status: "Success",
             data:{
